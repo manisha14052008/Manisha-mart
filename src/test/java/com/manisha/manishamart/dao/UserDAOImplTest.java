@@ -27,7 +27,7 @@ class UserDAOImplTest {
 
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
-            stmt.execute("CREATE TABLE users (id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
+            stmt.execute("CREATE TABLE IF NOT EXISTS users (id BIGINT AUTO_INCREMENT PRIMARY KEY, " +
                     "name VARCHAR(100), email VARCHAR(150) UNIQUE, password_hash VARCHAR(255), " +
                     "role VARCHAR(10), created_at TIMESTAMP)");
         }
