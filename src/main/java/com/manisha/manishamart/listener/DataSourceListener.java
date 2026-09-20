@@ -23,7 +23,7 @@ public class DataSourceListener implements ServletContextListener {
         HikariConfig config = new HikariConfig();
 
         // Local dev: embedded H2. Switch to the tcp:// URL for server-mode H2 in production.
-        config.setJdbcUrl("jdbc:h2:./data/manishamart;AUTO_SERVER=TRUE");
+        config.setJdbcUrl("jdbc:h2:mem:manishamart;DB_CLOSE_DELAY=-1");
         config.setDriverClassName("org.h2.Driver");
         config.setUsername("sa");
         config.setPassword("");
