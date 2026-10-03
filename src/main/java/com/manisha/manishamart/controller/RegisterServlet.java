@@ -48,16 +48,30 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
         System.out.println("REGISTER: validation passed");
-
         try {
-            User.Role role = "SELLER".equalsIgnoreCase(roleParam) ? User.Role.SELLER : User.Role.BUYER;
-            authService.register(name, email, password, role);
-            resp.sendRedirect(req.getContextPath() + "/login");
-        } catch (IllegalArgumentException e) {
-            req.setAttribute("error", e.getMessage());
-            req.getRequestDispatcher("/register.jsp").forward(req, resp);
-        } catch (SQLException e) {
-            throw new ServletException("Database error during registration", e);
+    User.Role role = "SELLER".equalsIgnoreCase(roleParam)
+            ? User.Role.SELLER : User.Role.BUYER;
+
+    System.out.println("REGISTER: calling authService");
+
+    authService.register(name, email, password, role);
+
+    System.out.println("REGISTER: account created");
+
+    resp.sendRedirect(req.getContextPath() + "/login");
+
+    System.out.println("REGISTER: redirect sent");
+
+} catch (IllegalArgumentException e) {
+
+    System.out.println("REGISTER: " + e.getMessage());
+
+    req.setAttribute("error", e.getMessage());
+    req.getRequestDispatcher("/register.jsp").forward(req, resp);
+
+} catch (SQLException e) {
+
+    throw new ServletException("Database error during registration", e);
         }
     }
 }
