@@ -21,7 +21,8 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     public void init() {
-        authService = new AuthService(new UserDAOImpl(DataSourceListener.getDataSource()));
+        authService = new AuthService(
+                new UserDAOImpl(DataSourceListener.getDataSource()));
     }
 
     @Override
@@ -33,44 +34,57 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
         System.out.println("REGISTER POST REACHED");
-        System.out.println("REGISTER: checking form fields");      
+
         String name = req.getParameter("name");
         String email = req.getParameter("email");
         String password = req.getParameter("password");
         String roleParam = req.getParameter("role");
 
-        if (!ValidationUtil.isNonEmpty(name) || !ValidationUtil.isValidEmail(email)
+        System.out.println("REGISTER: checking form fields");
+
+        if (!ValidationUtil.isNonEmpty(name)
+                || !ValidationUtil.isValidEmail(email)
                 || !ValidationUtil.isValidPassword(password)) {
+
             System.out.println("REGISTER: validation failed");
-            req.setAttribute("error", "Please fill all fields correctly (password min 8 chars).");
+
+            req.setAttribute("error",
+                    "Please fill all fields correctly (password min 8 chars).");
+
             req.getRequestDispatcher("/register.jsp").forward(req, resp);
             return;
         }
+
         System.out.println("REGISTER: validation passed");
+
         try {
-    User.Role role = "SELLER".equalsIgnoreCase(roleParam)
-            ? User.Role.SELLER : User.Role.BUYER;
+            User.Role role = "SELLER".equalsIgnoreCase(roleParam)
+                    ? User.Role.SELLER
+                    : User.Role.BUYER;
 
-    System.out.println("REGISTER: calling authService");
+            System.out.println("REGISTER: calling authService");
 
-    authService.register(name, email, password, role);
+            authService.register(name, email, password, role);
 
-    System.out.println("REGISTER: account created");
+            System.out.println("REGISTER: account created");
 
-    resp.sendRedirect(req.getContextPath() + "/login");
+            resp.sendRedirect(req.getContextPath() + "/login");
 
-    System.out.println("REGISTER: redirect sent");
+        } catch (IllegalArgumentException e) {
 
-} catch (IllegalArgumentException e) {
+            System.out.println("REGISTER: " + e.getMessage());
 
-    System.out.println("REGISTER: " + e.getMessage());
+            req.setAttribute("error", e.getMessage());
+            req.getRequestDispatcher("/register.jsp").forward(req, resp);
 
-    req.setAttribute("error", e.getMessage());
-    req.getRequestDispatcher("/register.jsp").forward(req, resp);
+        } catch (SQLException e) {
 
-}  catch (SQLException e) {
-    e.printStackTrace();
-    throw new ServletException("Database error during registration", e);
+            e.printStackTrace();
+
+            throw new ServletException(
+                    "Database error during registration", e);
         }
-}
+    }
+            }
