@@ -17,12 +17,14 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public Optional<User> findByEmail(String email) throws SQLException {
+        System.out.println("FIND USER EMAIL: " + email);
         String sql = "SELECT id, name, email, password_hash, role, created_at FROM users WHERE email = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
+                    System.out.println("USER FOUND IN DATABASE");
                     return Optional.of(mapRow(rs));
                 }
                 return Optional.empty();
