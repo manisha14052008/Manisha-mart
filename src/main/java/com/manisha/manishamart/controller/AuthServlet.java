@@ -39,6 +39,7 @@ public class AuthServlet extends HttpServlet {
 
         try {
             Optional<User> userOpt = authService.login(email, password);
+            System.out.println("LOGIN USER FOUND: " + userOpt.isPresent());
             if (userOpt.isPresent()) {
                 req.getSession().invalidate();
                 HttpSession session = req.getSession(true);
