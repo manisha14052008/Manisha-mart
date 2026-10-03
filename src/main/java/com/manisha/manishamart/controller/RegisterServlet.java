@@ -69,9 +69,8 @@ public class RegisterServlet extends HttpServlet {
     req.setAttribute("error", e.getMessage());
     req.getRequestDispatcher("/register.jsp").forward(req, resp);
 
-} catch (SQLException e) {
-
+}  catch (SQLException e) {
+    e.printStackTrace();
     throw new ServletException("Database error during registration", e);
         }
-    }
 }
