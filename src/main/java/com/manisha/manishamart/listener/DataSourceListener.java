@@ -7,11 +7,11 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.sql.DataSource;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.Statement;
 
-/**
- * Single owner of the connection pool lifecycle (Section 2, rule 5).
- * No DriverManager.getConnection() calls should exist anywhere outside this class.
- */
 @WebListener
 public class DataSourceListener implements ServletContextListener {
 
@@ -20,17 +20,50 @@ public class DataSourceListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        HikariConfig config = new HikariConfig();
+        try {
+            HikariConfig config = new HikariConfig();
 
-        // Local dev: embedded H2. Switch to the tcp:// URL for server-mode H2 in production.
-        config.setJdbcUrl("jdbc:h2:mem:manishamart;DB_CLOSE_DELAY=-1");
-        config.setDriverClassName("org.h2.Driver");
-        config.setUsername("sa");
-        config.setPassword("");
-        config.setMaximumPoolSize(10);
+            config.setJdbcUrl("jdbc:h2:mem:manishamart;DB_CLOSE_DELAY=-1");
+            config.setDriverClassName("org.h2.Driver");
+            config.setUsername("sa");
+            config.setPassword("");
+            config.setMaximumPoolSize(10);
 
-        dataSource = new HikariDataSource(config);
-        sce.getServletContext().setAttribute(ATTRIBUTE_NAME, dataSource);
+            dataSource = new HikariDataSource(config);
+
+            runSchema();
+
+            sce.getServletContext().setAttribute(ATTRIBUTE_NAME, dataSource);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Database initialization failed", e);
+        }
+    }
+
+    private void runSchema() throws Exception {
+        InputStream input = getClass()
+                .getClassLoader()
+                .getResourceAsStream("schema.sql");
+
+        if (input == null) {
+            throw new RuntimeException("schema.sql not found");
+        }
+
+        String sql = new String(
+                input.readAllBytes(),
+                StandardCharsets.UTF_8
+        );
+
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            for (String command : sql.split(";")) {
+                if (!command.trim().isEmpty()) {
+                    stmt.execute(command.trim());
+                }
+            }
+        }
     }
 
     @Override
@@ -43,4 +76,4 @@ public class DataSourceListener implements ServletContextListener {
     public static DataSource getDataSource() {
         return dataSource;
     }
-}
+    }
