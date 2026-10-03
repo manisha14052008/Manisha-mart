@@ -33,6 +33,7 @@ public class RegisterServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        System.out.println("REGISTER POST REACHED");
         String name = req.getParameter("name");
         String email = req.getParameter("email");
         String password = req.getParameter("password");
