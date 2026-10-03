@@ -34,6 +34,7 @@ public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         System.out.println("REGISTER POST REACHED");
+        System.out.println("REGISTER: checking form fields");      
         String name = req.getParameter("name");
         String email = req.getParameter("email");
         String password = req.getParameter("password");
@@ -41,10 +42,12 @@ public class RegisterServlet extends HttpServlet {
 
         if (!ValidationUtil.isNonEmpty(name) || !ValidationUtil.isValidEmail(email)
                 || !ValidationUtil.isValidPassword(password)) {
+            System.out.println("REGISTER: validation failed");
             req.setAttribute("error", "Please fill all fields correctly (password min 8 chars).");
             req.getRequestDispatcher("/register.jsp").forward(req, resp);
             return;
         }
+        System.out.println("REGISTER: validation passed");
 
         try {
             User.Role role = "SELLER".equalsIgnoreCase(roleParam) ? User.Role.SELLER : User.Role.BUYER;
