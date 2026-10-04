@@ -12,7 +12,6 @@
 
 <h1>🛍️ ManishaMart Products</h1>
 
-<!-- Back to Home -->
 <p>
     <a href="${pageContext.request.contextPath}/home.jsp">
         ← Back to Home
@@ -21,17 +20,19 @@
 
 <hr>
 
-<!-- Search Products -->
 <h2>Browse Products</h2>
 
+<!-- Search -->
 <form action="${pageContext.request.contextPath}/products" method="get">
 
     <label>Search:</label>
-    <input type="text" name="keyword"
+    <input type="text"
+           name="keyword"
            placeholder="Search product">
 
     <label>Category:</label>
-    <input type="text" name="category"
+    <input type="text"
+           name="category"
            placeholder="Category">
 
     <button type="submit">Search</button>
@@ -40,7 +41,8 @@
 
 <hr>
 
-<!-- Seller: Add Product -->
+<!-- ==================== SELLER SECTION ==================== -->
+
 <c:if test="${sessionScope.user.role == 'SELLER'}">
 
     <h2>➕ Add Product</h2>
@@ -90,14 +92,15 @@
 </c:if>
 
 
-<!-- Product List -->
+<!-- ==================== PRODUCT LIST ==================== -->
+
 <h2>Available Products</h2>
 
 <c:choose>
 
     <c:when test="${not empty products}">
 
-        <table border="1" cellpadding="10">
+        <table border="1" cellpadding="8">
 
             <tr>
                 <th>ID</th>
@@ -106,6 +109,7 @@
                 <th>Price</th>
                 <th>Stock</th>
                 <th>Category</th>
+                <th>Cart</th>
             </tr>
 
             <c:forEach var="product" items="${products}">
@@ -136,6 +140,42 @@
                         ${product.category}
                     </td>
 
+                    <!-- Add to Cart -->
+                    <td>
+
+                        <c:choose>
+
+                            <c:when test="${product.stockQty > 0}">
+
+                                <form action="${pageContext.request.contextPath}/cart"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           name="productId"
+                                           value="${product.id}">
+
+                                    <input type="hidden"
+                                           name="quantity"
+                                           value="1">
+
+                                    <button type="submit">
+                                        🛒 Add to Cart
+                                    </button>
+
+                                </form>
+
+                            </c:when>
+
+                            <c:otherwise>
+
+                                <span>Out of Stock</span>
+
+                            </c:otherwise>
+
+                        </c:choose>
+
+                    </td>
+
                 </tr>
 
             </c:forEach>
@@ -146,9 +186,7 @@
 
     <c:otherwise>
 
-        <p>
-            No products available yet.
-        </p>
+        <p>No products available yet.</p>
 
     </c:otherwise>
 
@@ -156,8 +194,10 @@
 
 <hr>
 
-<!-- Cart and Orders -->
+<!-- ==================== CART / ORDERS ==================== -->
+
 <p>
+
     <a href="${pageContext.request.contextPath}/cart">
         <button type="button">🛒 My Cart</button>
     </a>
@@ -165,6 +205,7 @@
     <a href="${pageContext.request.contextPath}/orders">
         <button type="button">📦 My Orders</button>
     </a>
+
 </p>
 
 <p>
