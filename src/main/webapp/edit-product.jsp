@@ -23,15 +23,15 @@
 <form action="${pageContext.request.contextPath}/products"
       method="post">
 
-    <!-- EDIT ACTION -->
+    <!-- Action -->
     <input type="hidden"
            name="action"
            value="edit">
 
-    <!-- PRODUCT ID -->
+    <!-- Product ID -->
     <input type="hidden"
            name="id"
-           value="${param.id}">
+           value="${product.id}">
 
 
     <label>Product Name:</label>
@@ -39,6 +39,7 @@
 
     <input type="text"
            name="name"
+           value="${product.name}"
            required>
 
     <br><br>
@@ -48,7 +49,8 @@
     <br>
 
     <input type="text"
-           name="description">
+           name="description"
+           value="${product.description}">
 
     <br><br>
 
@@ -58,6 +60,7 @@
 
     <input type="number"
            name="price"
+           value="${product.price}"
            step="0.01"
            min="0.01"
            required>
@@ -70,6 +73,7 @@
 
     <input type="number"
            name="stockQty"
+           value="${product.stockQty}"
            min="0"
            required>
 
@@ -80,7 +84,8 @@
     <br>
 
     <input type="text"
-           name="category">
+           name="category"
+           value="${product.category}">
 
     <br><br>
 
