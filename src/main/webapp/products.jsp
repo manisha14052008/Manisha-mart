@@ -14,6 +14,11 @@
 <h1>🛍️ ManishaMart Products</h1>
 
 <p>
+    Welcome,
+    <b>${sessionScope.user.name}</b>
+</p>
+
+<p>
     <a href="${pageContext.request.contextPath}/home.jsp">
         ← Back to Home
     </a>
@@ -21,8 +26,9 @@
 
 <hr>
 
+
 <!-- ========================= -->
-<!-- SEARCH PRODUCTS -->
+<!-- SEARCH -->
 <!-- ========================= -->
 
 <h2>🔍 Browse Products</h2>
@@ -66,7 +72,6 @@
     <form action="${pageContext.request.contextPath}/products"
           method="post">
 
-        <!-- Action -->
         <input type="hidden"
                name="action"
                value="add">
@@ -150,81 +155,53 @@
             <tr>
 
                 <th>ID</th>
-
-                <th>Product Name</th>
-
+                <th>Name</th>
                 <th>Description</th>
-
                 <th>Price</th>
-
                 <th>Stock</th>
-
                 <th>Category</th>
-
                 <th>Cart</th>
 
-                <!-- Show Manage only for sellers -->
                 <c:if test="${sessionScope.user.role == 'SELLER'}">
-
                     <th>Manage</th>
-
                 </c:if>
 
             </tr>
 
-
-            <!-- LOOP THROUGH PRODUCTS -->
 
             <c:forEach var="product"
                        items="${products}">
 
                 <tr>
 
-                    <!-- ID -->
-
                     <td>
                         ${product.id}
                     </td>
-
-
-                    <!-- NAME -->
 
                     <td>
                         ${product.name}
                     </td>
 
-
-                    <!-- DESCRIPTION -->
-
                     <td>
                         ${product.description}
                     </td>
-
-
-                    <!-- PRICE -->
 
                     <td>
                         ₹${product.price}
                     </td>
 
-
-                    <!-- STOCK -->
-
                     <td>
                         ${product.stockQty}
                     </td>
-
-
-                    <!-- CATEGORY -->
 
                     <td>
                         ${product.category}
                     </td>
 
 
-                    <!-- ================= -->
+                    <!-- ========================= -->
                     <!-- ADD TO CART -->
-                    <!-- ================= -->
+                    <!-- ========================= -->
 
                     <td>
 
@@ -251,7 +228,6 @@
 
                             </c:when>
 
-
                             <c:otherwise>
 
                                 <span>
@@ -265,9 +241,9 @@
                     </td>
 
 
-                    <!-- ================= -->
+                    <!-- ========================= -->
                     <!-- SELLER MANAGEMENT -->
-                    <!-- ================= -->
+                    <!-- ========================= -->
 
                     <c:if test="${sessionScope.user.role == 'SELLER'
                                   && sessionScope.user.id == product.sellerId}">
@@ -276,7 +252,7 @@
 
                             <!-- EDIT -->
 
-                            <form action="${pageContext.request.contextPath}/edit-product.jsp"
+                            <form action="${pageContext.request.contextPath}/edit-product"
                                   method="get"
                                   style="display:inline;">
 
@@ -325,8 +301,6 @@
     </c:when>
 
 
-    <!-- NO PRODUCTS -->
-
     <c:otherwise>
 
         <p>
@@ -342,7 +316,7 @@
 
 
 <!-- ========================= -->
-<!-- CART / ORDERS -->
+<!-- QUICK LINKS -->
 <!-- ========================= -->
 
 <h3>Quick Links</h3>
@@ -350,25 +324,16 @@
 <p>
 
     <a href="${pageContext.request.contextPath}/cart">
-
-        <button type="button">
-            🛒 My Cart
-        </button>
-
+        🛒 My Cart
     </a>
 
-    &nbsp;
+    &nbsp;&nbsp;
 
     <a href="${pageContext.request.contextPath}/orders">
-
-        <button type="button">
-            📦 My Orders
-        </button>
-
+        📦 My Orders
     </a>
 
 </p>
-
 
 <hr>
 
