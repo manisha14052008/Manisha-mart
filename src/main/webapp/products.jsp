@@ -3,6 +3,7 @@
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>ManishaMart - Products</title>
@@ -20,28 +21,43 @@
 
 <hr>
 
-<h2>Browse Products</h2>
+<!-- ========================= -->
+<!-- SEARCH PRODUCTS -->
+<!-- ========================= -->
 
-<!-- Search -->
-<form action="${pageContext.request.contextPath}/products" method="get">
+<h2>🔍 Browse Products</h2>
+
+<form action="${pageContext.request.contextPath}/products"
+      method="get">
 
     <label>Search:</label>
+
     <input type="text"
            name="keyword"
            placeholder="Search product">
 
+    &nbsp;
+
     <label>Category:</label>
+
     <input type="text"
            name="category"
            placeholder="Category">
 
-    <button type="submit">Search</button>
+    &nbsp;
+
+    <button type="submit">
+        Search
+    </button>
 
 </form>
 
 <hr>
 
-<!-- ==================== SELLER SECTION ==================== -->
+
+<!-- ========================= -->
+<!-- SELLER: ADD PRODUCT -->
+<!-- ========================= -->
 
 <c:if test="${sessionScope.user.role == 'SELLER'}">
 
@@ -50,39 +66,64 @@
     <form action="${pageContext.request.contextPath}/products"
           method="post">
 
-        <label>Product Name:</label><br>
+        <!-- Action -->
+        <input type="hidden"
+               name="action"
+               value="add">
+
+        <label>Product Name:</label>
+        <br>
+
         <input type="text"
                name="name"
                required>
+
         <br><br>
 
-        <label>Description:</label><br>
+
+        <label>Description:</label>
+        <br>
+
         <input type="text"
                name="description">
+
         <br><br>
 
-        <label>Price:</label><br>
+
+        <label>Price:</label>
+        <br>
+
         <input type="number"
                name="price"
                step="0.01"
                min="0.01"
                required>
+
         <br><br>
 
-        <label>Stock Quantity:</label><br>
+
+        <label>Stock Quantity:</label>
+        <br>
+
         <input type="number"
                name="stockQty"
                min="0"
                required>
+
         <br><br>
 
-        <label>Category:</label><br>
+
+        <label>Category:</label>
+        <br>
+
         <input type="text"
                name="category">
+
         <br><br>
 
+
         <button type="submit">
-            Add Product
+            ➕ Add Product
         </button>
 
     </form>
@@ -92,55 +133,99 @@
 </c:if>
 
 
-<!-- ==================== PRODUCT LIST ==================== -->
+<!-- ========================= -->
+<!-- PRODUCT LIST -->
+<!-- ========================= -->
 
-<h2>Available Products</h2>
+<h2>📦 Available Products</h2>
 
 <c:choose>
 
     <c:when test="${not empty products}">
 
-        <table border="1" cellpadding="8">
+        <table border="1"
+               cellpadding="8"
+               cellspacing="0">
 
             <tr>
+
                 <th>ID</th>
-                <th>Name</th>
+
+                <th>Product Name</th>
+
                 <th>Description</th>
+
                 <th>Price</th>
+
                 <th>Stock</th>
+
                 <th>Category</th>
+
                 <th>Cart</th>
+
+                <!-- Show Manage only for sellers -->
+                <c:if test="${sessionScope.user.role == 'SELLER'}">
+
+                    <th>Manage</th>
+
+                </c:if>
+
             </tr>
 
-            <c:forEach var="product" items="${products}">
+
+            <!-- LOOP THROUGH PRODUCTS -->
+
+            <c:forEach var="product"
+                       items="${products}">
 
                 <tr>
+
+                    <!-- ID -->
 
                     <td>
                         ${product.id}
                     </td>
 
+
+                    <!-- NAME -->
+
                     <td>
                         ${product.name}
                     </td>
+
+
+                    <!-- DESCRIPTION -->
 
                     <td>
                         ${product.description}
                     </td>
 
+
+                    <!-- PRICE -->
+
                     <td>
                         ₹${product.price}
                     </td>
+
+
+                    <!-- STOCK -->
 
                     <td>
                         ${product.stockQty}
                     </td>
 
+
+                    <!-- CATEGORY -->
+
                     <td>
                         ${product.category}
                     </td>
 
-                    <!-- Add to Cart -->
+
+                    <!-- ================= -->
+                    <!-- ADD TO CART -->
+                    <!-- ================= -->
+
                     <td>
 
                         <c:choose>
@@ -166,15 +251,70 @@
 
                             </c:when>
 
+
                             <c:otherwise>
 
-                                <span>Out of Stock</span>
+                                <span>
+                                    ❌ Out of Stock
+                                </span>
 
                             </c:otherwise>
 
                         </c:choose>
 
                     </td>
+
+
+                    <!-- ================= -->
+                    <!-- SELLER MANAGEMENT -->
+                    <!-- ================= -->
+
+                    <c:if test="${sessionScope.user.role == 'SELLER'
+                                  && sessionScope.user.id == product.sellerId}">
+
+                        <td>
+
+                            <!-- EDIT -->
+
+                            <form action="${pageContext.request.contextPath}/edit-product.jsp"
+                                  method="get"
+                                  style="display:inline;">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="${product.id}">
+
+                                <button type="submit">
+                                    ✏️ Edit
+                                </button>
+
+                            </form>
+
+
+                            <!-- DELETE -->
+
+                            <form action="${pageContext.request.contextPath}/products"
+                                  method="post"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Are you sure you want to delete this product?');">
+
+                                <input type="hidden"
+                                       name="action"
+                                       value="delete">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="${product.id}">
+
+                                <button type="submit">
+                                    🗑️ Delete
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </c:if>
 
                 </tr>
 
@@ -184,35 +324,65 @@
 
     </c:when>
 
+
+    <!-- NO PRODUCTS -->
+
     <c:otherwise>
 
-        <p>No products available yet.</p>
+        <p>
+            No products available yet.
+        </p>
 
     </c:otherwise>
 
 </c:choose>
 
+
 <hr>
 
-<!-- ==================== CART / ORDERS ==================== -->
+
+<!-- ========================= -->
+<!-- CART / ORDERS -->
+<!-- ========================= -->
+
+<h3>Quick Links</h3>
 
 <p>
 
     <a href="${pageContext.request.contextPath}/cart">
-        <button type="button">🛒 My Cart</button>
+
+        <button type="button">
+            🛒 My Cart
+        </button>
+
     </a>
 
+    &nbsp;
+
     <a href="${pageContext.request.contextPath}/orders">
-        <button type="button">📦 My Orders</button>
+
+        <button type="button">
+            📦 My Orders
+        </button>
+
     </a>
 
 </p>
 
+
+<hr>
+
+
+<!-- LOGOUT -->
+
 <p>
+
     <a href="${pageContext.request.contextPath}/login">
-        Logout
+        🚪 Logout
     </a>
+
 </p>
 
 </body>
+
 </html>
