@@ -25,19 +25,25 @@ public class ProductServlet extends HttpServlet {
     @Override
     public void init() {
         productService = new ProductService(
-                new ProductDAOImpl(DataSourceListener.getDataSource())
+                new ProductDAOImpl(
+                        DataSourceListener.getDataSource()
+                )
         );
     }
 
-    // Browse products
+    // =========================
+    // GET - VIEW PRODUCTS
+    // =========================
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(HttpServletRequest req,
+                         HttpServletResponse resp)
             throws ServletException, IOException {
 
         String keyword = req.getParameter("keyword");
         String category = req.getParameter("category");
 
         try {
+
             List<Product> products =
                     productService.browse(keyword, category);
 
@@ -47,79 +53,199 @@ public class ProductServlet extends HttpServlet {
                     .forward(req, resp);
 
         } catch (SQLException e) {
+
             throw new ServletException(
                     "Database error loading products", e);
         }
     }
 
-    // Add product
+    // =========================
+    // POST - ADD / EDIT / DELETE
+    // =========================
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    protected void doPost(HttpServletRequest req,
+                          HttpServletResponse resp)
             throws ServletException, IOException {
 
-        HttpSession session = req.getSession(false);
+        HttpSession session =
+                req.getSession(false);
 
         // Check login
         if (session == null ||
                 session.getAttribute("user") == null) {
 
             resp.sendRedirect(
-                    req.getContextPath() + "/login");
-            return;
-        }
-
-        User user = (User) session.getAttribute("user");
-
-        // Only Seller can add products
-        if (user.getRole() != User.Role.SELLER) {
-
-            resp.sendError(
-                    HttpServletResponse.SC_FORBIDDEN,
-                    "Only sellers can add products."
+                    req.getContextPath() + "/login"
             );
             return;
         }
 
+        User user =
+                (User) session.getAttribute("user");
+
+        // Only SELLER can modify products
+        if (user.getRole() != User.Role.SELLER) {
+
+            resp.sendError(
+                    HttpServletResponse.SC_FORBIDDEN,
+                    "Only sellers can manage products."
+            );
+            return;
+        }
+
+        String action = req.getParameter("action");
+
         try {
 
-            Product product = new Product();
+            // =========================
+            // ADD PRODUCT
+            // =========================
+            if ("add".equals(action)) {
 
-            // Get seller ID from logged-in user
-            product.setSellerId(user.getId());
+                Product product = new Product();
 
-            // Get product details from form
-            product.setName(req.getParameter("name"));
+                product.setSellerId(user.getId());
+                product.setName(
+                        req.getParameter("name")
+                );
+                product.setDescription(
+                        req.getParameter("description")
+                );
+                product.setPrice(
+                        new BigDecimal(
+                                req.getParameter("price")
+                        )
+                );
+                product.setStockQty(
+                        Integer.parseInt(
+                                req.getParameter("stockQty")
+                        )
+                );
+                product.setCategory(
+                        req.getParameter("category")
+                );
 
-            product.setDescription(
-                    req.getParameter("description"));
+                productService.create(product);
 
-            product.setPrice(
-                    new BigDecimal(
-                            req.getParameter("price")));
+            }
 
-            product.setStockQty(
-                    Integer.parseInt(
-                            req.getParameter("stockQty")));
+            // =========================
+            // EDIT PRODUCT
+            // =========================
+            else if ("edit".equals(action)) {
 
-            product.setCategory(
-                    req.getParameter("category"));
+                Long productId =
+                        Long.parseLong(
+                                req.getParameter("id")
+                        );
 
-            // Save product
-            productService.create(product);
+                Product product =
+                        productService
+                                .listBySeller(user.getId())
+                                .stream()
+                                .filter(p ->
+                                        p.getId()
+                                                .equals(productId))
+                                .findFirst()
+                                .orElse(null);
 
-            // Go back to products page
+                // Product does not belong to this seller
+                if (product == null) {
+
+                    resp.sendError(
+                            HttpServletResponse.SC_FORBIDDEN,
+                            "You can edit only your own products."
+                    );
+                    return;
+                }
+
+                product.setName(
+                        req.getParameter("name")
+                );
+
+                product.setDescription(
+                        req.getParameter("description")
+                );
+
+                product.setPrice(
+                        new BigDecimal(
+                                req.getParameter("price")
+                        )
+                );
+
+                product.setStockQty(
+                        Integer.parseInt(
+                                req.getParameter("stockQty")
+                        )
+                );
+
+                product.setCategory(
+                        req.getParameter("category")
+                );
+
+                productService.update(product);
+            }
+
+            // =========================
+            // DELETE PRODUCT
+            // =========================
+            else if ("delete".equals(action)) {
+
+                Long productId =
+                        Long.parseLong(
+                                req.getParameter("id")
+                        );
+
+                Product product =
+                        productService
+                                .listBySeller(user.getId())
+                                .stream()
+                                .filter(p ->
+                                        p.getId()
+                                                .equals(productId))
+                                .findFirst()
+                                .orElse(null);
+
+                // Product does not belong to this seller
+                if (product == null) {
+
+                    resp.sendError(
+                            HttpServletResponse.SC_FORBIDDEN,
+                            "You can delete only your own products."
+                    );
+                    return;
+                }
+
+                productService.delete(productId);
+            }
+
+            else {
+
+                resp.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Invalid product action."
+                );
+                return;
+            }
+
+            // Back to products
             resp.sendRedirect(
-                    req.getContextPath() + "/products");
+                    req.getContextPath() + "/products"
+            );
 
         } catch (NumberFormatException e) {
 
             throw new ServletException(
-                    "Invalid price or stock quantity", e);
+                    "Invalid product ID, price or stock quantity.",
+                    e
+            );
 
         } catch (SQLException e) {
 
             throw new ServletException(
-                    "Database error creating product", e);
+                    "Database error managing product.",
+                    e
+            );
         }
     }
-}
+            }
