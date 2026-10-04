@@ -46,7 +46,7 @@ public class AuthServlet extends HttpServlet {
                 HttpSession session = req.getSession(true);
                 session.setAttribute("user", userOpt.get());
                 session.setMaxInactiveInterval(30 * 60);
-                resp.sendRedirect(req.getContextPath() + "/login");
+                resp.sendRedirect(req.getContextPath() + "/home.jsp");
             } else {
                 req.setAttribute("error", "Invalid email or password");
                 req.getRequestDispatcher("/login.jsp").forward(req, resp);
