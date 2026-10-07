@@ -45,6 +45,8 @@
 
 <hr>
 
+<!-- SELLER ONLY: ADD PRODUCT -->
+
 <c:if test="${sessionScope.user.role == 'SELLER'}">
 
     <h2>➕ Add Product</h2>
@@ -62,11 +64,18 @@
         <br><br>
 
         <label>Price:</label><br>
-        <input type="number" name="price" step="0.01" min="0.01" required>
+        <input type="number"
+               name="price"
+               step="0.01"
+               min="0.01"
+               required>
         <br><br>
 
         <label>Stock Quantity:</label><br>
-        <input type="number" name="stockQty" min="0" required>
+        <input type="number"
+               name="stockQty"
+               min="0"
+               required>
         <br><br>
 
         <label>Category:</label><br>
@@ -80,6 +89,9 @@
     <hr>
 
 </c:if>
+
+
+<!-- AVAILABLE PRODUCTS -->
 
 <h2>📦 Available Products</h2>
 
@@ -102,27 +114,40 @@
                 <c:if test="${sessionScope.user.role == 'SELLER'}">
                     <th>Manage</th>
                 </c:if>
+
             </tr>
+
 
             <c:forEach var="product" items="${products}">
 
                 <tr>
 
-                    <td>${product.id}</td>
+                    <td>
+                        ${product.id}
+                    </td>
 
                     <td>
                         <b>${product.name}</b>
                     </td>
 
-                    <td>${product.description}</td>
+                    <td>
+                        ${product.description}
+                    </td>
 
-                    <td>₹${product.price}</td>
+                    <td>
+                        ₹${product.price}
+                    </td>
 
-                    <td>${product.stockQty}</td>
+                    <td>
+                        ${product.stockQty}
+                    </td>
 
-                    <td>${product.category}</td>
+                    <td>
+                        ${product.category}
+                    </td>
 
-                    <!-- CART -->
+
+                    <!-- ADD TO CART -->
 
                     <td>
 
@@ -151,13 +176,16 @@
 
                             <c:otherwise>
 
-                                <span>❌ Out of Stock</span>
+                                <span>
+                                    ❌ Out of Stock
+                                </span>
 
                             </c:otherwise>
 
                         </c:choose>
 
                     </td>
+
 
                     <!-- REVIEW -->
 
@@ -169,10 +197,10 @@
 
                     </td>
 
+
                     <!-- SELLER MANAGEMENT -->
 
-                    <c:if test="${sessionScope.user.role == 'SELLER'
-                                  && sessionScope.user.id == product.sellerId}">
+                    <c:if test="${sessionScope.user.role == 'SELLER' && sessionScope.user.id == product.sellerId}">
 
                         <td>
 
@@ -183,4 +211,90 @@
                                   style="display:inline;">
 
                                 <input type="hidden"
-                                       name
+                                       name="id"
+                                       value="${product.id}">
+
+                                <button type="submit">
+                                    ✏️ Edit
+                                </button>
+
+                            </form>
+
+
+                            <!-- DELETE -->
+
+                            <form action="${pageContext.request.contextPath}/products"
+                                  method="post"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Are you sure you want to delete this product?');">
+
+                                <input type="hidden"
+                                       name="action"
+                                       value="delete">
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="${product.id}">
+
+                                <button type="submit">
+                                    🗑️ Delete
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </c:if>
+
+                </tr>
+
+            </c:forEach>
+
+        </table>
+
+    </c:when>
+
+
+    <c:otherwise>
+
+        <p>
+            No products available yet.
+        </p>
+
+    </c:otherwise>
+
+</c:choose>
+
+
+<hr>
+
+<!-- QUICK LINKS -->
+
+<h3>🔗 Quick Links</h3>
+
+<p>
+
+    <a href="${pageContext.request.contextPath}/cart">
+        🛒 My Cart
+    </a>
+
+    &nbsp;&nbsp;
+
+    <a href="${pageContext.request.contextPath}/orders">
+        📦 My Orders
+    </a>
+
+</p>
+
+<hr>
+
+<p>
+
+    <a href="${pageContext.request.contextPath}/login">
+        🚪 Logout
+    </a>
+
+</p>
+
+</body>
+</html>
