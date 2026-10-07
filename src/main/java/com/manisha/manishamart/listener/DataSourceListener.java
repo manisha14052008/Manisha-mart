@@ -23,7 +23,11 @@ public class DataSourceListener implements ServletContextListener {
         try {
             HikariConfig config = new HikariConfig();
 
-            config.setJdbcUrl("jdbc:h2:mem:manishamart;DB_CLOSE_DELAY=-1");
+            // Persistent H2 database running in server mode
+            config.setJdbcUrl(
+                    "jdbc:h2:tcp://localhost:9092/./data/manishamart"
+            );
+
             config.setDriverClassName("org.h2.Driver");
             config.setUsername("sa");
             config.setPassword("");
@@ -33,15 +37,20 @@ public class DataSourceListener implements ServletContextListener {
 
             runSchema();
 
-            sce.getServletContext().setAttribute(ATTRIBUTE_NAME, dataSource);
+            sce.getServletContext()
+                    .setAttribute(ATTRIBUTE_NAME, dataSource);
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Database initialization failed", e);
+            throw new RuntimeException(
+                    "Database initialization failed",
+                    e
+            );
         }
     }
 
     private void runSchema() throws Exception {
+
         InputStream input = getClass()
                 .getClassLoader()
                 .getResourceAsStream("schema.sql");
@@ -59,6 +68,7 @@ public class DataSourceListener implements ServletContextListener {
              Statement stmt = conn.createStatement()) {
 
             for (String command : sql.split(";")) {
+
                 if (!command.trim().isEmpty()) {
                     stmt.execute(command.trim());
                 }
@@ -68,6 +78,7 @@ public class DataSourceListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+
         if (dataSource != null) {
             dataSource.close();
         }
@@ -76,4 +87,4 @@ public class DataSourceListener implements ServletContextListener {
     public static DataSource getDataSource() {
         return dataSource;
     }
-    }
+}
