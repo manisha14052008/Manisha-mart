@@ -16,6 +16,7 @@ import java.sql.Statement;
 public class DataSourceListener implements ServletContextListener {
 
     private static HikariDataSource dataSource;
+
     public static final String ATTRIBUTE_NAME = "dataSource";
 
     @Override
@@ -23,9 +24,9 @@ public class DataSourceListener implements ServletContextListener {
         try {
             HikariConfig config = new HikariConfig();
 
-            // Persistent H2 database running in server mode
+            // H2 in-memory database
             config.setJdbcUrl(
-                    "jdbc:h2:tcp://localhost:9092/./data/manishamart"
+                    "jdbc:h2:mem:manishamart;DB_CLOSE_DELAY=-1"
             );
 
             config.setDriverClassName("org.h2.Driver");
@@ -35,6 +36,7 @@ public class DataSourceListener implements ServletContextListener {
 
             dataSource = new HikariDataSource(config);
 
+            // Create tables
             runSchema();
 
             sce.getServletContext()
@@ -42,6 +44,7 @@ public class DataSourceListener implements ServletContextListener {
 
         } catch (Exception e) {
             e.printStackTrace();
+
             throw new RuntimeException(
                     "Database initialization failed",
                     e
@@ -56,7 +59,9 @@ public class DataSourceListener implements ServletContextListener {
                 .getResourceAsStream("schema.sql");
 
         if (input == null) {
-            throw new RuntimeException("schema.sql not found");
+            throw new RuntimeException(
+                    "schema.sql not found"
+            );
         }
 
         String sql = new String(
@@ -87,4 +92,4 @@ public class DataSourceListener implements ServletContextListener {
     public static DataSource getDataSource() {
         return dataSource;
     }
-}
+    }
