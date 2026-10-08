@@ -26,8 +26,8 @@ public class DataSourceListener implements ServletContextListener {
 
             // H2 in-memory database
             config.setJdbcUrl(
-                    "jdbc:h2:mem:manishamart;DB_CLOSE_DELAY=-1"
-            );
+        "jdbc:h2:tcp://localhost:9092/./data/manishamart"
+);
 
             config.setDriverClassName("org.h2.Driver");
             config.setUsername("sa");
