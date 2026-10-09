@@ -1,6 +1,12 @@
 package com.manisha.manishamart.controller;
 
-import java.io.IOException;
+import com.manisha.manishamart.dao.CartDAOImpl;
+import com.manisha.manishamart.dao.OrderDAOImpl;
+import com.manisha.manishamart.listener.DataSourceListener;
+import com.manisha.manishamart.model.CartItem;
+import com.manisha.manishamart.model.Order;
+import com.manisha.manishamart.model.User;
+import com.manisha.manishamart.service.OrderService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,10 +15,32 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
 @WebServlet("/checkout")
 public class CheckoutServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+
+    private OrderService orderService;
+    private CartDAOImpl cartDAO;
+
+    @Override
+    public void init() {
+
+        cartDAO = new CartDAOImpl(
+                DataSourceListener.getDataSource()
+        );
+
+        orderService = new OrderService(
+                new OrderDAOImpl(
+                        DataSourceListener.getDataSource()
+                ),
+                cartDAO
+        );
+    }
 
     @Override
     protected void doGet(
@@ -22,15 +50,40 @@ public class CheckoutServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null ||
+                session.getAttribute("user") == null) {
+
             response.sendRedirect(
-                request.getContextPath() + "/login"
+                    request.getContextPath() + "/login"
             );
             return;
         }
 
-        request.getRequestDispatcher("/checkout.jsp")
-               .forward(request, response);
+        User user = (User) session.getAttribute("user");
+
+        try {
+
+            List<CartItem> items =
+                    cartDAO.findByUser(user.getId());
+
+            if (items.isEmpty()) {
+                response.sendRedirect(
+                        request.getContextPath() + "/cart"
+                );
+                return;
+            }
+
+            request.setAttribute("items", items);
+
+            request.getRequestDispatcher("/checkout.jsp")
+                    .forward(request, response);
+
+        } catch (SQLException e) {
+
+            throw new ServletException(
+                    "Unable to load checkout details", e
+            );
+        }
     }
 
     @Override
@@ -43,18 +96,31 @@ public class CheckoutServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null || session.getAttribute("user") == null) {
+        if (session == null ||
+                session.getAttribute("user") == null) {
+
             response.sendRedirect(
-                request.getContextPath() + "/login"
+                    request.getContextPath() + "/login"
             );
             return;
         }
 
-        String fullName = request.getParameter("fullName");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String address = request.getParameter("address");
-        String paymentMethod = request.getParameter("paymentMethod");
+        User user = (User) session.getAttribute("user");
+
+        String fullName =
+                request.getParameter("fullName");
+
+        String email =
+                request.getParameter("email");
+
+        String phone =
+                request.getParameter("phone");
+
+        String address =
+                request.getParameter("address");
+
+        String paymentMethod =
+                request.getParameter("paymentMethod");
 
         if (isBlank(fullName)
                 || isBlank(email)
@@ -63,56 +129,99 @@ public class CheckoutServlet extends HttpServlet {
                 || isBlank(paymentMethod)) {
 
             request.setAttribute(
-                "error",
-                "Please fill in all delivery and payment fields."
+                    "error",
+                    "Please fill in all checkout fields."
             );
 
-            request.getRequestDispatcher("/checkout.jsp")
-                   .forward(request, response);
+            showCheckout(request, response, user);
             return;
         }
 
         if (!phone.matches("[0-9]{10}")) {
+
             request.setAttribute(
-                "error",
-                "Please enter a valid 10-digit phone number."
+                    "error",
+                    "Enter a valid 10-digit phone number."
             );
 
-            request.getRequestDispatcher("/checkout.jsp")
-                   .forward(request, response);
+            showCheckout(request, response, user);
             return;
         }
 
-        if (!paymentMethod.equals("COD")
-                && !paymentMethod.equals("ONLINE")) {
+        if (!email.matches(
+                "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
 
             request.setAttribute(
-                "error",
-                "Please select a valid payment method."
+                    "error",
+                    "Enter a valid email address."
             );
 
-            request.getRequestDispatcher("/checkout.jsp")
-                   .forward(request, response);
+            showCheckout(request, response, user);
             return;
         }
 
-        /*
-         * NEXT STEP:
-         * Connect this point to your existing cart and order database.
-         *
-         * The order must be saved successfully before the cart is cleared
-         * and the buyer is redirected to the Orders page.
-         *
-         * Do not report a successful order until database saving works.
-         */
+        if (!"COD".equals(paymentMethod)
+                && !"ONLINE".equals(paymentMethod)) {
 
-        request.setAttribute(
-            "error",
-            "Your details are valid, but order processing is not connected yet."
-        );
+            request.setAttribute(
+                    "error",
+                    "Please select a valid payment method."
+            );
 
-        request.getRequestDispatcher("/checkout.jsp")
-               .forward(request, response);
+            showCheckout(request, response, user);
+            return;
+        }
+
+        try {
+
+            Order savedOrder =
+                    orderService.checkout(user.getId());
+
+            session.setAttribute(
+                    "lastOrderId",
+                    savedOrder.getId()
+            );
+
+            response.sendRedirect(
+                    request.getContextPath() + "/orders"
+            );
+
+        } catch (IllegalStateException e) {
+
+            request.setAttribute("error", e.getMessage());
+
+            showCheckout(request, response, user);
+
+        } catch (SQLException e) {
+
+            throw new ServletException(
+                    "Unable to save your order", e
+            );
+        }
+    }
+
+    private void showCheckout(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            User user)
+            throws ServletException, IOException {
+
+        try {
+
+            List<CartItem> items =
+                    cartDAO.findByUser(user.getId());
+
+            request.setAttribute("items", items);
+
+            request.getRequestDispatcher("/checkout.jsp")
+                    .forward(request, response);
+
+        } catch (SQLException e) {
+
+            throw new ServletException(
+                    "Unable to reload checkout page", e
+            );
+        }
     }
 
     private boolean isBlank(String value) {
