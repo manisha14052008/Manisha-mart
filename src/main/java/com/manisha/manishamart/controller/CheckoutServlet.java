@@ -1,4 +1,4 @@
-package com.manisha.manishamart.servlet;
+package com.manisha.manishamart.controller;
 
 import java.io.IOException;
 
