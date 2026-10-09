@@ -6,98 +6,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Login | ManishaMart</title>
 
-    <link rel="stylesheet"
-          href="${pageContext.request.contextPath}/css/style.css">
-
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
+            margin: 0;
             min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5eaff, #fff7fb);
             display: flex;
             flex-direction: column;
         }
 
-        .login-layout {
+        header {
+            background: white;
+            padding: 18px 7%;
+            box-shadow: 0 3px 15px #0000000d;
+        }
+
+        header a {
+            color: #7628b8;
+            font-size: 25px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        main {
             flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: center;
-            gap: 40px;
-            padding-top: 35px;
-            padding-bottom: 35px;
-        }
-
-        .login-welcome {
-            padding: 25px;
-        }
-
-        .login-welcome h1 {
-            margin: 18px 0;
-            font-size: clamp(35px, 5vw, 55px);
-            line-height: 1.12;
-            letter-spacing: -1px;
-        }
-
-        .login-welcome p {
-            max-width: 450px;
-            color: var(--muted);
-            font-size: 16px;
-        }
-
-        .welcome-icon {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 95px;
-            height: 95px;
-            border-radius: 28px;
-            background: linear-gradient(135deg, #efedff, #fff0f5);
-            font-size: 48px;
+            padding: 30px 15px;
         }
 
         .login-card {
             width: 100%;
-            max-width: 460px;
-            margin: 0 auto;
-            padding: 35px;
+            max-width: 420px;
             background: white;
-            border: 1px solid var(--border);
-            border-radius: 25px;
-            box-shadow: var(--shadow);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 12px 40px #64288c1a;
         }
 
-        .login-card h2 {
-            font-size: 29px;
-            margin-bottom: 7px;
+        .icon {
+            text-align: center;
+            font-size: 48px;
         }
 
-        .login-description {
-            color: var(--muted);
+        h1 {
+            text-align: center;
+            color: #382047;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            text-align: center;
+            color: #777;
             margin-bottom: 25px;
+            line-height: 1.5;
         }
 
-        .login-card .form-group {
-            margin-bottom: 20px;
+        label {
+            display: block;
+            margin: 18px 0 8px;
+            font-weight: bold;
+            color: #382047;
         }
 
-        .login-card .btn {
+        input {
             width: 100%;
-            margin-top: 8px;
+            padding: 13px;
+            border: 1px solid #ded3e8;
+            border-radius: 9px;
+            font-size: 15px;
         }
 
-        .login-extra {
+        input:focus {
+            outline: 2px solid #d9b8f4;
+            border-color: #7628b8;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 14px;
+            background: linear-gradient(135deg, #9146c6, #702bb0);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #b42318;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            background: #eaf8ee;
+            color: #18753b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .register-link {
             text-align: center;
             margin-top: 22px;
+            color: #666;
             font-size: 14px;
         }
 
-        .login-extra a {
-            color: var(--primary);
-            font-weight: 700;
+        .register-link a {
+            color: #7628b8;
+            font-weight: bold;
+            text-decoration: none;
         }
 
-        .back-home {
-            display: inline-block;
-            margin-top: 
+        footer {
+            text-align: center;
+            padding: 18px;
+            color: #777;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <a href="${pageContext.request.contextPath}/home.jsp">
+        ManishaMart
+    </a>
+</header>
+
+<main>
+    <section class="login-card">
+
+        <div class="icon">🛍️</div>
+
+        <h1>Welcome Back!</h1>
+
+        <p class="description">
+            Sign in to continue shopping with ManishaMart.
+        </p>
+
+        <c:if test="${not empty error}">
+            <div class="error">
+                <c:out value="${error}" />
+            </div>
+        </c:if>
+
+        <c:if test="${not empty message}">
+            <div class="message">
+                <c:out value="${message}" />
+            </div>
+        </c:if>
+
+        <form action="${pageContext.request.contextPath}/login"
+              method="post">
+
+            <label for="email">Email Address</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                autocomplete="email"
+                required>
+
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required>
+
+            <button type="submit">Login →</button>
+
+        </form>
+
+        <div class="register-link">
+            Don't have an account?
+            <a href="${pageContext.request.contextPath}/register">
+                Create Account
+            </a>
+        </div>
+
+    </section>
+</main>
+
+<footer>
+    © 2026 ManishaMart · Happy Shopping 💜
+</footer>
+
+</body>
+</html>
