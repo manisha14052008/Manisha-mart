@@ -1,169 +1,252 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ManishaMart - Home</title>
+    <title>ManishaMart | Smart Shopping</title>
 
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/style.css">
 </head>
 
 <body>
 
-<h1>🛍️ Welcome to ManishaMart</h1>
+<!-- Navigation -->
+<header class="navbar">
+    <div class="container nav-inner">
 
-<hr>
+        <a class="brand"
+           href="${pageContext.request.contextPath}/home.jsp">
+            Manisha<span>Mart.</span>
+        </a>
 
-<!-- USER INFORMATION -->
+        <nav class="nav-links">
+            <a class="active"
+               href="${pageContext.request.contextPath}/home.jsp">
+                Home
+            </a>
 
-<c:choose>
+            <a href="${pageContext.request.contextPath}/products">
+                Products
+            </a>
 
-    <c:when test="${not empty sessionScope.user}">
+            <a href="${pageContext.request.contextPath}/orders">
+                My Orders
+            </a>
 
-        <h2>
-            Welcome,
-            ${sessionScope.user.name} 👋
+            <a href="${pageContext.request.contextPath}/cart">
+                🛒 Cart
+            </a>
+
+            <a class="btn btn-primary"
+               href="${pageContext.request.contextPath}/login">
+                Login
+            </a>
+        </nav>
+
+    </div>
+</header>
+
+
+<main class="container">
+
+    <!-- Hero Section -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <span class="hero-label">
+                ✨ YOUR EVERYDAY MARKETPLACE
+            </span>
+
+            <h1>
+                Shop Smart.<br>
+                Live Better.
+            </h1>
+
+            <p>
+                Discover products you love, explore new finds,
+                and enjoy a simpler shopping experience with
+                ManishaMart.
+            </p>
+
+            <a class="btn"
+               href="${pageContext.request.contextPath}/products">
+                Explore Products &nbsp; →
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- Categories -->
+    <section class="section">
+
+        <h2 class="section-title">
+            Explore Categories
         </h2>
 
-        <p>
-            <b>Role:</b>
-            ${sessionScope.user.role}
+        <p class="section-subtitle">
+            Find something special for your everyday needs.
         </p>
 
-    </c:when>
+        <div class="category-grid">
 
-    <c:otherwise>
+            <a class="category-card"
+               href="${pageContext.request.contextPath}/products?category=Electronics">
 
-        <p>
-            Welcome to ManishaMart!
-        </p>
+                <div class="category-icon">🎧</div>
 
-    </c:otherwise>
+                <h3>Electronics</h3>
 
-</c:choose>
+                <p>Everyday technology</p>
 
-
-<hr>
-
-
-<!-- MAIN FEATURES -->
-
-<h2>📌 Main Features</h2>
-
-<p>
-    <a href="${pageContext.request.contextPath}/products">
-        🛍️ Browse Products
-    </a>
-</p>
-
-
-<p>
-    <a href="${pageContext.request.contextPath}/cart">
-        🛒 My Cart
-    </a>
-</p>
-
-
-<p>
-    <a href="${pageContext.request.contextPath}/orders">
-        📦 My Orders
-    </a>
-</p>
-
-
-<!-- CHATBOT -->
-
-<p>
-    <a href="${pageContext.request.contextPath}/chatbot">
-        🤖 AI Chatbot
-    </a>
-</p>
-
-
-<hr>
-
-
-<!-- SELLER FEATURE -->
-
-<c:if test="${sessionScope.user.role == 'SELLER'}">
-
-    <h2>🏪 Seller</h2>
-
-    <p>
-        <a href="${pageContext.request.contextPath}/products">
-            ➕ Add / Manage Products
-        </a>
-    </p>
-
-</c:if>
-
-
-<!-- ADMIN FEATURE -->
-
-<c:if test="${sessionScope.user.role == 'ADMIN'}">
-
-    <h2>⚙️ Admin</h2>
-
-    <p>
-        <a href="${pageContext.request.contextPath}/admin">
-            ⚙️ Admin Dashboard
-        </a>
-    </p>
-
-</c:if>
-
-
-<hr>
-
-
-<!-- ACCOUNT -->
-
-<h2>👤 Account</h2>
-
-<c:choose>
-
-    <c:when test="${not empty sessionScope.user}">
-
-        <p>
-            <a href="${pageContext.request.contextPath}/logout">
-                🚪 Logout
             </a>
+
+
+            <a class="category-card"
+               href="${pageContext.request.contextPath}/products?category=Fashion">
+
+                <div class="category-icon">👗</div>
+
+                <h3>Fashion</h3>
+
+                <p>Discover your style</p>
+
+            </a>
+
+
+            <a class="category-card"
+               href="${pageContext.request.contextPath}/products?category=Home">
+
+                <div class="category-icon">🏡</div>
+
+                <h3>Home & Living</h3>
+
+                <p>Make life comfortable</p>
+
+            </a>
+
+
+            <a class="category-card"
+               href="${pageContext.request.contextPath}/products?category=Accessories">
+
+                <div class="category-icon">⌚</div>
+
+                <h3>Accessories</h3>
+
+                <p>Little things you love</p>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- Featured Products -->
+    <section class="section">
+
+        <h2 class="section-title">
+            Find Your Next Favourite
+        </h2>
+
+        <p class="section-subtitle">
+            Browse our marketplace to discover available products.
         </p>
 
-    </c:when>
+        <div class="content-card">
 
-    <c:otherwise>
+            <div class="empty-state">
+
+                <div class="empty-icon">🛍️</div>
+
+                <h3>Your next favourite is waiting!</h3>
+
+                <p>
+                    Visit our products page to browse listings
+                    from ManishaMart sellers.
+                </p>
+
+                <a class="btn btn-primary"
+                   href="${pageContext.request.contextPath}/products">
+                    Browse All Products →
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Benefits -->
+    <section class="section">
+
+        <h2 class="section-title">
+            Shopping Made Simpler
+        </h2>
+
+        <p class="section-subtitle">
+            Everything you need for a smooth shopping journey.
+        </p>
+
+        <div class="category-grid">
+
+            <div class="category-card">
+                <div class="category-icon">🔎</div>
+                <h3>Easy Discovery</h3>
+                <p>Search and explore products.</p>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">🛒</div>
+                <h3>Simple Cart</h3>
+                <p>Manage your shopping in one place.</p>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">📦</div>
+                <h3>Track Orders</h3>
+                <p>Check your order history.</p>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">🤖</div>
+                <h3>Smart Assistant</h3>
+                <p>Get help through our chatbot.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- Footer -->
+<footer class="footer">
+
+    <div class="container footer-inner">
+
+        <div>
+            <a class="brand" href="${pageContext.request.contextPath}/home.jsp">
+                Manisha<span>Mart.</span>
+            </a>
+
+            <p>Smart Shopping. Simple Experience.</p>
+        </div>
 
         <p>
-            <a href="${pageContext.request.contextPath}/login">
-                🔐 Login
-            </a>
+            © 2026 ManishaMart. All rights reserved.
         </p>
 
-        <p>
-            <a href="${pageContext.request.contextPath}/register">
-                📝 Register
-            </a>
-        </p>
+    </div>
 
-    </c:otherwise>
-
-</c:choose>
-
-
-<hr>
-
-<p>
-    <b>ManishaMart</b>
-</p>
-
-<p>
-    Simple Online Marketplace
-</p>
+</footer>
 
 </body>
-
 </html>
